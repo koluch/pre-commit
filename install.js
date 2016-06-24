@@ -52,10 +52,25 @@ catch (e) {}
 // installation of this module to completely fail. We should just output the
 // error instead destroying the whole npm install process.
 //
-try { fs.symlinkSync(path.relative(hooks, hook), precommit, 'file'); }
+try {
+  try {
+    fs.symlinkSync(path.relative(hooks, hook), precommit, 'file');
+  }
+  catch (e) {
+    if (e.code === "EPERM ") {
+      console.error('pre-commit:');
+      console.error('pre-commit: EPERM error while making symlink to hook file. Trying to copy it, maybe it is Windows?');
+      console.error('pre-commit:');
+      fs.createReadStream(path.relative(hooks, hook)).pipe(fs.createWriteStream(precommit));
+    }
+    else {
+      throw e;
+    }
+  }
+}
 catch (e) {
   console.error('pre-commit:');
-  console.error('pre-commit: Failed to symlink the hook file in your .git/hooks folder because:');
+  console.error('pre-commit: !!!! Failed to symlink the hook file in your .git/hooks folder because:');
   console.error('pre-commit: '+ e.message);
   console.error('pre-commit: The hook was not installed.');
   console.error('pre-commit:');
