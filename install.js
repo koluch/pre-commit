@@ -57,7 +57,7 @@ try {
     fs.symlinkSync(path.relative(hooks, hook), precommit, 'file');
   }
   catch (e) {
-    if (e.code === "EPERM ") {
+    if (e.code === 'EPERM') {
       console.error('pre-commit:');
       console.error('pre-commit: EPERM error while making symlink to hook file. Trying to copy it, maybe it is Windows?');
       console.error('pre-commit:');
